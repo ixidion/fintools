@@ -29,9 +29,9 @@ fn request_symbol(isin: &str) -> (String, String) {
     match yqi {
         None => return (String::from(isin), String::from("error")),
         Some(entry) => {
-            println!("{:?}", entry);
-            println!("{:?}", entry.exchange);
-            println!("{}:{}", entry.exchange, entry.symbol);
+            // println!("{:?}", entry);
+            // println!("{:?}", entry.exchange);
+            // println!("{}:{}", entry.exchange, entry.symbol);
             // exchange.insert_str(0, entry.exchange.as_str());
             let mut exchange = String::from(&entry.exchange);
             exchange = convert_exchange(exchange.as_str()).to_string();
@@ -44,24 +44,19 @@ fn request_symbol(isin: &str) -> (String, String) {
 }
 
 pub fn request_symbols(symbols: Vec<&str>) -> HashMap<String, String> {
-    let mut map = HashMap::<String,String>::new();
-    let pool = rayon::ThreadPoolBuilder::new().num_threads(1).build().unwrap();
+    let map = HashMap::<String,String>::new();
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(8).build().unwrap();
     let (tx, rx): (Sender<(String, String)>, Receiver<(String, String)>) = mpsc::channel();
-    let pool = pool.install(|| {
+    pool.install(|| {
         symbols.par_iter().for_each_with(tx, |tx, s| {            
-            println!("{s}");
+            // println!("{s}");
             let isin = s.split(";").nth(0).unwrap();
             tx.clone().send(request_symbol(isin)).expect("Channel sent failed.");
             }
         );
     });
 
-    
-    // for (e, s) in rx {
-    //     println!("Got {:?}", &e);
-    //     map.insert(e, s);
-    // } 
-    let mut map: HashMap<String,String> = rx.iter()
+    let map: HashMap<String,String> = rx.iter()
         .collect();
     map
 }

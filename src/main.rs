@@ -1,9 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 pub mod finlibs;
-
+use std::fs;
 use finlibs::cache;
 use finlibs::finance;
-
+use rfd::FileDialog;
 
 use eframe::egui;
 
@@ -50,9 +50,29 @@ impl eframe::App for MyApp {
 
                 let line_vec: Vec<&str> = lines.into_iter().collect();
                 let map = finance::request_symbols(line_vec);
-                for (key, val) in &map {
-                    println!("##{}: {}", key, val);
-                }
+
+                let out_str = map.iter()
+                .map(|n| n.1)
+                .fold(String::new(), | acc, x| acc + x + "\n");
+                // .map(|k,v|  +"\n")
+                // for (key, val) in &map {
+                //     println!("##{}: {}", key, val);
+                // }
+
+
+                println!("-{}-", out_str);
+
+                let mut files = FileDialog::new()
+                    .add_filter("text", &["txt", "rs"])
+                    .add_filter("rust", &["rs", "toml"])
+                    .set_directory("/")
+                    .pick_folder()
+                    .unwrap();
+                files.push("test.txt");
+                println!("{:?}", files);
+                fs::write(files, out_str)
+                    .expect("Should have been able to write the file");
+
             }
         });
     }
