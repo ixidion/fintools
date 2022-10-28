@@ -1,8 +1,12 @@
 use std::collections::HashMap;
 use std::collections::BTreeMap;
+use std::path::PathBuf;
 use std::vec::Vec;
 use std::fs;
 use serde_json;
+
+use super::utils;
+use super::envs;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct IsinNSymbol {
@@ -11,7 +15,7 @@ struct IsinNSymbol {
 }
 
 pub fn read_map() -> HashMap<String, String> {
-    let file_path = "C:\\Users\\plabo\\git\\finance\\finance-lib\\data\\symbol_cache.json";
+    let file_path = crate::envs::get_config().cache_file;
 
     let contents = fs::read_to_string(file_path)
         .expect("Should have been able to read the file");
@@ -28,7 +32,11 @@ pub fn read_map() -> HashMap<String, String> {
 
 pub fn write_map(map: HashMap<String,String>) {
 
-    let file_path = "C:\\Users\\plabo\\git\\finance\\finance-lib\\data\\symbol_cache2.txt";
+    let file_path = envs::get_config().cache_file;
+    let filename = format!("{}.json", utils::formatted_timestamp());
+    let backup_file_path = utils::change_extension(file_path.clone(), &filename);
+
+
     
     let sorted_map = sort_map(map);
 
@@ -38,7 +46,9 @@ pub fn write_map(map: HashMap<String,String>) {
     
     let contents = serde_json::to_string(&sorted_map).unwrap();
 
-    fs::write(file_path, contents)
+    fs::rename(&file_path, backup_file_path);
+
+    fs::write(&file_path, contents)
         .expect("Should have been able to write the file");
 
 }

@@ -1,17 +1,29 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+#[macro_use]
+extern crate lazy_static;
+
 pub mod finlibs;
 use std::fs;
 use finlibs::cache;
 use finlibs::finance;
 use rfd::FileDialog;
+use finlibs::envs;
+
 
 use eframe::egui;
+
+use crate::finlibs::utils;
+
 
 fn main() {
     let mut options = eframe::NativeOptions::default();
     options.transparent = true;
     options.initial_window_size.replace(egui::Vec2::new(400.0, 600.0));
+
+    let myconf = envs::get_config();
     
+    println!("{:?}", myconf.cache_file);
+
     eframe::run_native(
         "FinTools",
         options,
@@ -60,17 +72,18 @@ impl eframe::App for MyApp {
                 // }
 
 
-                println!("-{}-", out_str);
+                println!("-{:?}-", envs::get_config().output_path);
 
-                let mut files = FileDialog::new()
+                let mut file_path = FileDialog::new()
                     .add_filter("text", &["txt", "rs"])
                     .add_filter("rust", &["rs", "toml"])
-                    .set_directory("/")
+                    .set_directory(envs::get_config().output_path)
                     .pick_folder()
                     .unwrap();
-                files.push("test.txt");
-                println!("{:?}", files);
-                fs::write(files, out_str)
+                let filename = format!("{}.txt", utils::formatted_timestamp());
+                file_path.push(filename);
+                println!("{:?}", file_path);
+                fs::write(file_path, out_str)
                     .expect("Should have been able to write the file");
 
             }

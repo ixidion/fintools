@@ -1,5 +1,7 @@
 pub mod cache;
 pub mod finance;
+pub mod envs;
+pub mod utils;
 
 
 pub fn add(left: usize, right: usize) -> usize {
@@ -23,4 +25,5 @@ mod tests {
         let result = add(2, 2);
         assert_eq!(result, 4);
     } 
+
 }
