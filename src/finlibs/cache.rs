@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::collections::BTreeMap;
-use std::path::PathBuf;
 use std::vec::Vec;
 use std::fs;
 use serde_json;
@@ -35,18 +34,13 @@ pub fn write_map(map: HashMap<String,String>) {
     let file_path = envs::get_config().cache_file;
     let filename = format!("{}.json", utils::formatted_timestamp());
     let backup_file_path = utils::change_extension(file_path.clone(), &filename);
-
-
-    
+   
     let sorted_map = sort_map(map);
-
-    // let iter = sorted_map
-    //     .into_iter()
-    //     .map(|(k,v)| (String::from(v), String::from(k)));
     
     let contents = serde_json::to_string(&sorted_map).unwrap();
 
-    fs::rename(&file_path, backup_file_path);
+    fs::rename(&file_path, backup_file_path)
+        .expect("Renaming failed.");
 
     fs::write(&file_path, contents)
         .expect("Should have been able to write the file");
@@ -68,7 +62,6 @@ fn sort_map(map_in: HashMap<String, String>) -> Vec<IsinNSymbol> {
             symbol: String::from(key)
         };
         out_vec.push(isin);
-        //println!("{}: {}", key, value);
     }    
 
     out_vec    
@@ -82,10 +75,10 @@ mod tests {
 
     #[test]
     fn readfile() {
-        let map = crate::cache::read_map();
+        let map = read_map();
         let my_str = map.get("US87968A1043");
         assert_eq!(my_str.unwrap(), "AMEX:TELL");
-        crate::cache::write_map(map);
+        write_map(map);
     }    
 
     #[test]
@@ -93,7 +86,7 @@ mod tests {
         let mut in_map: HashMap<String, String> =  HashMap::new();
         in_map.insert(String::from("1"), String::from("a"));
         in_map.insert(String::from("2"), String::from("b"));
-        crate::cache::write_map(in_map);
+        write_map(in_map);
     }
 
     #[test]

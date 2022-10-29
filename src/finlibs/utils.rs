@@ -10,7 +10,7 @@ pub fn formatted_timestamp() -> String {
 pub fn change_extension(path: impl AsRef<Path>, name: &str, ) -> PathBuf {
     let path = path.as_ref();
     let mut result = path.to_owned();
-    if let Some(ext) = path.extension() {
+    if let Some(_ext) = path.extension() {
         result.set_extension(name);
     }
     result

@@ -4,7 +4,6 @@ extern crate lazy_static;
 
 pub mod finlibs;
 use std::fs;
-use finlibs::cache;
 use finlibs::finance;
 use rfd::FileDialog;
 use finlibs::envs;
@@ -19,11 +18,7 @@ fn main() {
     let mut options = eframe::NativeOptions::default();
     options.transparent = true;
     options.initial_window_size.replace(egui::Vec2::new(400.0, 600.0));
-
-    let myconf = envs::get_config();
-    
-    println!("{:?}", myconf.cache_file);
-
+  
     eframe::run_native(
         "FinTools",
         options,
@@ -58,21 +53,14 @@ impl eframe::App for MyApp {
             });
             ui.add_space(10.0);
             if ui.button("Convert").clicked() {
-                let mut lines = self.isins.lines();
+                let lines = self.isins.lines();
 
                 let line_vec: Vec<&str> = lines.into_iter().collect();
                 let map = finance::request_symbols(line_vec);
 
                 let out_str = map.iter()
-                .map(|n| n.1)
-                .fold(String::new(), | acc, x| acc + x + "\n");
-                // .map(|k,v|  +"\n")
-                // for (key, val) in &map {
-                //     println!("##{}: {}", key, val);
-                // }
-
-
-                println!("-{:?}-", envs::get_config().output_path);
+                    .map(|n| n.1)
+                    .fold(String::new(), | acc, x| acc + x + "\n");
 
                 let mut file_path = FileDialog::new()
                     .add_filter("text", &["txt", "rs"])
@@ -82,7 +70,7 @@ impl eframe::App for MyApp {
                     .unwrap();
                 let filename = format!("{}.txt", utils::formatted_timestamp());
                 file_path.push(filename);
-                println!("{:?}", file_path);
+
                 fs::write(file_path, out_str)
                     .expect("Should have been able to write the file");
 
@@ -129,14 +117,3 @@ impl eframe::App for MyApp {
 
     fn post_rendering(&mut self, _window_size_px: [u32; 2], _frame: &eframe::Frame) {}
 }
-
-// fn main() {
-//     // env::set_var("RUST_BACKTRACE", "full");
-
-//     println!("{}", finlibs::add_two(2));
-
-//     let in_vec: Vec<&str> = vec!["US0378331005", "US26856L1035", "US6304021057"];
-//     finance::request_symbols(in_vec);
-
-//     //cache::read_map();
-// }

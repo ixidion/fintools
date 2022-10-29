@@ -1,7 +1,7 @@
 use yahoo_finance_api as yahoo;
 use tokio_test;
-use rayon::{prelude::*, join};
-use std::{thread, time, collections::HashMap};
+use rayon::{prelude::*};
+use std::{collections::HashMap};
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use ::phf::{Map, phf_map};
@@ -44,7 +44,6 @@ fn request_symbol(isin: &str) -> (String, String) {
 }
 
 pub fn request_symbols(symbols: Vec<&str>) -> HashMap<String, String> {
-    let map = HashMap::<String,String>::new();
     let pool = rayon::ThreadPoolBuilder::new().num_threads(8).build().unwrap();
     let (tx, rx): (Sender<(String, String)>, Receiver<(String, String)>) = mpsc::channel();
     pool.install(|| {
