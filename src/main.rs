@@ -41,7 +41,16 @@ impl Default for MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("ISIN Converter");
+            ui.horizontal(|ui| {
+                ui.with_layout(egui::Layout::left_to_right(egui::Align::LEFT), |ui| {
+                    ui.heading("ISIN Converter");
+                });
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::RIGHT), |ui| {
+                    if ui.button("Compare").clicked() {
+                        self.compare();
+                    }
+                });                
+            });            
             ui.add_space(10.0);
             ui.vertical(|ui| {
                 ui.set_max_height(500.0);
@@ -53,27 +62,7 @@ impl eframe::App for MyApp {
             });
             ui.add_space(10.0);
             if ui.button("Convert").clicked() {
-                let lines = self.isins.lines();
-
-                let line_vec: Vec<&str> = lines.into_iter().collect();
-                let map = finance::request_symbols(line_vec);
-
-                let out_str = map.iter()
-                    .map(|n| n.1)
-                    .fold(String::new(), | acc, x| acc + x + "\n");
-
-                let mut file_path = FileDialog::new()
-                    .add_filter("text", &["txt", "rs"])
-                    .add_filter("rust", &["rs", "toml"])
-                    .set_directory(envs::get_config().output_path)
-                    .pick_folder()
-                    .unwrap();
-                let filename = format!("{}.txt", utils::formatted_timestamp());
-                file_path.push(filename);
-
-                fs::write(file_path, out_str)
-                    .expect("Should have been able to write the file");
-
+                self.convert();
             }
         });
     }
@@ -116,4 +105,45 @@ impl eframe::App for MyApp {
     }
 
     fn post_rendering(&mut self, _window_size_px: [u32; 2], _frame: &eframe::Frame) {}
+}
+
+impl MyApp {
+    fn convert(&self) -> Option<i32> {
+        if self.isins.len() < 12 { 
+            Some(0)
+        } else {
+            let lines = self.isins.lines();
+
+            let line_vec: Vec<&str> = lines.into_iter().collect();
+            let map = finance::request_symbols(line_vec);
+
+            if map.len() > 0 {
+                let out_str = map.iter()
+                    .map(|n| n.1)
+                    .fold(String::new(), | acc, x| acc + x + "\n");
+
+
+                let filename = envs::get_config().prefix_stocklist + &utils::formatted_timestamp() + ".txt";
+            
+                let file_path = FileDialog::new()
+                    .add_filter("text", &["txt"])
+                    .set_directory(envs::get_config().output_path)
+                    .set_file_name(&filename)
+                    .pick_folder();
+
+                if file_path.is_some() {
+                    let mut fp = file_path.unwrap();
+                    fp.push(&filename);
+
+                    fs::write(fp, out_str)
+                        .expect("Should have been able to write the file");
+                }
+            }
+            Some(map.len() as i32)
+        }
+    }
+
+    fn compare(&self) {
+
+    }
 }

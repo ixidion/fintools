@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "lldb",
             "request": "launch",
@@ -20,6 +21,10 @@
                 }
             },
             "args": [],
+            "env": {
+                "FINAPP__CACHE_FILE": "N:\\weekly_symbols\\cache\\symbol_cache.json",
+                "FINAPP__OUTPUT_PATH": "N:\\weekly_symbols",
+            },
             "cwd": "${workspaceFolder}"
         },
         {
@@ -39,6 +44,10 @@
                 }
             },
             "args": [],
+            "env": {
+                "FINAPP__CACHE_FILE": "N:\\weekly_symbols\\cache\\symbol_cache.json",
+                "FINAPP__OUTPUT_PATH": "N:\\weekly_symbols",
+            },            
             "cwd": "${workspaceFolder}"
         }
     ]

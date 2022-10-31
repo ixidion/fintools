@@ -16,16 +16,16 @@ struct IsinNSymbol {
 pub fn read_map() -> HashMap<String, String> {
     let file_path = crate::envs::get_config().cache_file;
 
-    let contents = fs::read_to_string(file_path)
-        .expect("Should have been able to read the file");
+    let contents = fs::read_to_string(file_path).unwrap_or_default();
 
-    let json_contents: Vec<IsinNSymbol> = serde_json::from_str(&contents)
-        .expect("Something went wrong during JSON-Parsing.");
+    let json_contents: Vec<IsinNSymbol> = serde_json::from_str(&contents).unwrap_or_default();
 
     let map: HashMap<String, String> = json_contents
         .iter()
         .map(|i| (String::from(&i.isin), String::from(&i.symbol)))
         .collect();
+
+    //println!("{:?}", map);
     map
 }
 
@@ -39,12 +39,26 @@ pub fn write_map(map: HashMap<String,String>) {
     
     let contents = serde_json::to_string(&sorted_map).unwrap();
 
-    fs::rename(&file_path, backup_file_path)
-        .expect("Renaming failed.");
+    match fs::rename(&file_path, backup_file_path) {
+        Ok(_) => (),
+        Err(_) => eprintln!("Renaming not possible. Can be ignored normally."),
+    };
 
-    fs::write(&file_path, contents)
+    fs::write(&file_path, &contents)
         .expect("Should have been able to write the file");
 
+}
+
+pub fn merge_map(to_merge: HashMap<String, String>) {
+    let mut original_map: HashMap<String, String> = read_map();
+
+    let to_merge_cleaned: HashMap<String, String> = to_merge
+        .into_iter()
+        .filter(|(_,v)| v.contains("error") == false)
+        .collect();
+    
+    original_map.extend(to_merge_cleaned);
+    write_map(original_map);
 }
 
 fn sort_map(map_in: HashMap<String, String>) -> Vec<IsinNSymbol> {

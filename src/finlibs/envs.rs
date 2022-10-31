@@ -24,14 +24,26 @@ pub struct Configuration {
     pub cache_file: PathBuf,
     #[serde(default = "default_path_out")]
     pub output_path: PathBuf,
+    #[serde(default = "default_prefix_stocklist")]
+    pub prefix_stocklist: String,    
+    #[serde(default = "default_prefix_diff")]
+    pub prefix_diff: String,        
 }
 
 fn default_path_cache() -> PathBuf {
-    let path = PathBuf::from("C:\\temp\\symbol_cache.json");
+    let path = PathBuf::from("N:\\weekly_symbols\\cache\\symbol_cache.json");
     path
 }
 
 fn default_path_out() -> PathBuf {
-    let path = PathBuf::from("C:\\temp");
+    let path = PathBuf::from("N:\\weekly_symbols");
     path
+}
+
+fn default_prefix_stocklist() -> String {
+    "stocks".to_string()
+}
+
+fn default_prefix_diff() -> String {
+    "diff".to_string()
 }
