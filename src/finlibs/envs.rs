@@ -8,8 +8,8 @@ lazy_static! {
 
 fn init_envs() -> Configuration {
     let config = envy::prefixed("FINAPP__")
-    .from_env::<Configuration>()
-    .expect("Please provide all necessary ENV-Variables.");
+        .from_env::<Configuration>()
+        .expect("Please provide all necessary ENV-Variables.");
 
     config
 }
@@ -24,19 +24,28 @@ pub struct Configuration {
     pub cache_file: PathBuf,
     #[serde(default = "default_path_out")]
     pub output_path: PathBuf,
+    #[serde(default = "default_path_diffout")]
+    pub output_path_diff: PathBuf,
     #[serde(default = "default_prefix_stocklist")]
-    pub prefix_stocklist: String,    
+    pub prefix_stocklist: String,
     #[serde(default = "default_prefix_diff")]
-    pub prefix_diff: String,        
+    pub prefix_diff: String,
+    #[serde(default = "default_suffix")]
+    pub suffix: String,
 }
 
 fn default_path_cache() -> PathBuf {
-    let path = PathBuf::from("N:\\weekly_symbols\\cache\\symbol_cache.json");
+    let path = PathBuf::from("C:\\temp\\symbol_cache.json");
     path
 }
 
 fn default_path_out() -> PathBuf {
-    let path = PathBuf::from("N:\\weekly_symbols");
+    let path = PathBuf::from("C:\\temp");
+    path
+}
+
+fn default_path_diffout() -> PathBuf {
+    let path = PathBuf::from("C:\\temp\\diffs");
     path
 }
 
@@ -46,4 +55,8 @@ fn default_prefix_stocklist() -> String {
 
 fn default_prefix_diff() -> String {
     "diff".to_string()
+}
+
+fn default_suffix() -> String {
+    ".txt".to_string()
 }

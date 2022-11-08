@@ -3,22 +3,22 @@
 extern crate lazy_static;
 
 pub mod finlibs;
-use std::fs;
+use finlibs::envs;
 use finlibs::finance;
 use rfd::FileDialog;
-use finlibs::envs;
-
+use std::fs;
 
 use eframe::egui;
 
 use crate::finlibs::utils;
 
-
 fn main() {
     let mut options = eframe::NativeOptions::default();
     options.transparent = true;
-    options.initial_window_size.replace(egui::Vec2::new(400.0, 600.0));
-  
+    options
+        .initial_window_size
+        .replace(egui::Vec2::new(400.0, 600.0));
+
     eframe::run_native(
         "FinTools",
         options,
@@ -49,8 +49,8 @@ impl eframe::App for MyApp {
                     if ui.button("Compare").clicked() {
                         self.compare();
                     }
-                });                
-            });            
+                });
+            });
             ui.add_space(10.0);
             ui.vertical(|ui| {
                 ui.set_max_height(500.0);
@@ -109,7 +109,7 @@ impl eframe::App for MyApp {
 
 impl MyApp {
     fn convert(&self) -> Option<i32> {
-        if self.isins.len() < 12 { 
+        if self.isins.len() < 12 {
             Some(0)
         } else {
             let lines = self.isins.lines();
@@ -118,15 +118,16 @@ impl MyApp {
             let map = finance::request_symbols(line_vec);
 
             if map.len() > 0 {
-                let out_str = map.iter()
+                let out_str = map
+                    .iter()
                     .map(|n| n.1)
-                    .fold(String::new(), | acc, x| acc + x + "\n");
+                    .fold(String::new(), |acc, x| acc + x + "\n");
 
+                let filename = envs::get_config().prefix_stocklist
+                    + &utils::formatted_timestamp()
+                    + &envs::get_config().suffix;
 
-                let filename = envs::get_config().prefix_stocklist + &utils::formatted_timestamp() + ".txt";
-            
                 let file_path = FileDialog::new()
-                    .add_filter("text", &["txt"])
                     .set_directory(envs::get_config().output_path)
                     .set_file_name(&filename)
                     .pick_folder();
@@ -135,8 +136,7 @@ impl MyApp {
                     let mut fp = file_path.unwrap();
                     fp.push(&filename);
 
-                    fs::write(fp, out_str)
-                        .expect("Should have been able to write the file");
+                    fs::write(fp, out_str).expect("Should have been able to write the file");
                 }
             }
             Some(map.len() as i32)
@@ -144,6 +144,17 @@ impl MyApp {
     }
 
     fn compare(&self) {
+        let file_names = FileDialog::new()
+            .add_filter("text", &["txt"])
+            .set_directory(envs::get_config().output_path)
+            .pick_files();
 
+        if file_names.is_some() {
+            let fn_vec = file_names.unwrap();
+            println!("{:?}", fn_vec);
+            if fn_vec.len() == 2 {
+                finance::compare(&fn_vec);
+            }
+        }
     }
 }
