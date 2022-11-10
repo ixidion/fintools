@@ -2,7 +2,6 @@ use super::cache;
 use super::envs;
 use super::utils;
 use ::phf::{phf_map, Map};
-use rayon::collections::hash_set::Iter;
 use rayon::prelude::*;
 use regex::Regex;
 use std::fs;

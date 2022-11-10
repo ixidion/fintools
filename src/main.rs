@@ -13,7 +13,19 @@ use eframe::egui;
 use crate::finlibs::utils;
 
 fn main() {
-    let mut options = eframe::NativeOptions::default();
+    // Set Icon in the upper left corner
+    const IMG: &[u8] = include_bytes!("../ressources/emblem-money.ico");
+    let icon = image::load_from_memory(IMG).unwrap().to_rgba8();
+    let (icon_width, icon_height) = icon.dimensions();
+    let mut options = eframe::NativeOptions {
+        icon_data: Some(eframe::IconData {
+            rgba: icon.into_raw(),
+            width: icon_width,
+            height: icon_height,
+        }),
+        ..Default::default()
+    };
+
     options.transparent = true;
     options
         .initial_window_size
