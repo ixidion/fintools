@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::vec::Vec;
 
-use super::envs;
+use super::settings::get_config as cnf;
 use super::utils;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -14,7 +14,7 @@ struct IsinNSymbol {
 }
 
 pub fn read_map() -> HashMap<String, String> {
-    let file_path = crate::envs::get_config().cache_file;
+    let file_path = cnf().paths.cache_file;
 
     let contents = fs::read_to_string(file_path).unwrap_or_default();
 
@@ -30,7 +30,7 @@ pub fn read_map() -> HashMap<String, String> {
 }
 
 pub fn write_map(map: HashMap<String, String>) {
-    let file_path = envs::get_config().cache_file;
+    let file_path = cnf().paths.cache_file;
     let filename = format!("{}.json", utils::formatted_timestamp());
     let backup_file_path = utils::change_extension(file_path.clone(), &filename);
 

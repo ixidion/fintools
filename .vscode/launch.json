@@ -22,8 +22,6 @@
             },
             "args": [],
             "env": {
-                "FINAPP__CACHE_FILE": "N:\\weekly_symbols\\cache\\symbol_cache.json",
-                "FINAPP__OUTPUT_PATH": "N:\\weekly_symbols",
             },
             "cwd": "${workspaceFolder}"
         },
@@ -45,9 +43,6 @@
             },
             "args": [],
             "env": {
-                "FINAPP__CACHE_FILE": "N:\\weekly_symbols\\cache\\symbol_cache.json",
-                "FINAPP__OUTPUT_PATH": "N:\\weekly_symbols",
-                "FINAPP__OUTPUT_PATH_DIFF": "N:\\weekly_symbols\\diffs",
             },            
             "cwd": "${workspaceFolder}"
         }

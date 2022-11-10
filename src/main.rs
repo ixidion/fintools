@@ -3,16 +3,16 @@
 extern crate lazy_static;
 
 pub mod finlibs;
-use finlibs::envs;
-use finlibs::finance;
+use finlibs::{finance, settings::get_config as cnf};
 use rfd::FileDialog;
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use eframe::egui;
 
 use crate::finlibs::utils;
 
 fn main() {
+    init();
     // Set Icon in the upper left corner
     const IMG: &[u8] = include_bytes!("../ressources/emblem-money.ico");
     let icon = image::load_from_memory(IMG).unwrap().to_rgba8();
@@ -36,6 +36,20 @@ fn main() {
         options,
         Box::new(|_cc| Box::new(MyApp::default())),
     );
+}
+
+fn init() {
+    let mut cache_path = cnf().paths.cache_file;
+    cache_path.pop();
+    let output_path = cnf().paths.output_path;
+    let output_path_diff = cnf().paths.output_path_diff;
+    let in_vec: Vec<&PathBuf> = vec![&cache_path, &output_path, &output_path_diff];
+    for path in in_vec {
+        if !path.is_dir() {
+            fs::create_dir(path).expect("Should have been able to create dir.");
+        }
+    }
+
 }
 
 struct MyApp {
@@ -135,13 +149,13 @@ impl MyApp {
                     .map(|n| n.1)
                     .fold(String::new(), |acc, x| acc + x + "\n");
 
-                let filename = envs::get_config().prefix_stocklist
+                let filename = cnf().vars.prefix_stocklist
                     + &utils::formatted_timestamp()
-                    + &envs::get_config().suffix;
+                    + &cnf().vars.suffix;
 
+                println!("{:?}", cnf().paths.output_path);
                 let file_path = FileDialog::new()
-                    .set_directory(envs::get_config().output_path)
-                    .set_file_name(&filename)
+                    .set_directory(cnf().paths.output_path.canonicalize().unwrap())                    
                     .pick_folder();
 
                 if file_path.is_some() {
@@ -158,7 +172,7 @@ impl MyApp {
     fn compare(&self) {
         let file_names = FileDialog::new()
             .add_filter("text", &["txt"])
-            .set_directory(envs::get_config().output_path)
+            .set_directory(cnf().paths.output_path)
             .pick_files();
 
         if file_names.is_some() {

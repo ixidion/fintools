@@ -1,5 +1,6 @@
+use crate::finlibs::settings::get_config as cnf;
+
 use super::cache;
-use super::envs;
 use super::utils;
 use ::phf::{phf_map, Map};
 use rayon::prelude::*;
@@ -130,10 +131,10 @@ fn compare_files(filename1_buff: &PathBuf, filename2_buff: &PathBuf) {
 
     let contents = new_entries + &gone_entries;
 
-    let filename = envs::get_config().prefix_diff
+    let filename = cnf().vars.prefix_diff
         + utils::formatted_timestamp().as_str()
-        + &envs::get_config().suffix;
-    let full_path = envs::get_config().output_path_diff.join(filename);
+        + &cnf().vars.suffix;
+    let full_path = cnf().paths.output_path_diff.join(filename);
 
     fs::write(full_path, &contents).expect("Should have been able to write the file");
 
