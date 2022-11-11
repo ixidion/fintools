@@ -153,11 +153,12 @@ impl MyApp {
                     + &utils::formatted_timestamp()
                     + &cnf().vars.suffix;
 
-                println!("{:?}", cnf().paths.output_path);
-                let file_path = FileDialog::new()
-                    .set_directory(cnf().paths.output_path.canonicalize().unwrap())                    
-                    .pick_folder();
+                let out_path = cnf().paths.output_path.as_path().to_owned();
 
+                let file_path = FileDialog::new()
+                    .set_directory(out_path)                    
+                    .pick_folder();
+                
                 if file_path.is_some() {
                     let mut fp = file_path.unwrap();
                     fp.push(&filename);

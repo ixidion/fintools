@@ -1,3 +1,4 @@
 /target
 Cargo.lock
 settings.toml
+ressources/settings_local.toml
