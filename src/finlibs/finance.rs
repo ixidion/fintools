@@ -37,7 +37,8 @@ fn request_symbol(isin: &str) -> (String, String) {
         Some(entry) => {
             let mut exchange = String::from(&entry.exchange);
             exchange = convert_exchange(exchange.as_str()).to_string();
-            let symbol = String::from(&entry.symbol);
+            let mut symbol = String::from(&entry.symbol);
+            convert_symbol(&mut symbol);
             combo = format!("{}:{}", exchange, symbol);
         }
     }
@@ -94,6 +95,10 @@ fn convert_exchange(ex_in: &str) -> &str {
         );
         return "error";
     }
+}
+
+fn convert_symbol(symbol: &mut String) {
+    *symbol = symbol.replace("-", ".");
 }
 
 pub fn compare(fn_vec: &Vec<PathBuf>) {

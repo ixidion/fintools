@@ -144,10 +144,18 @@ impl MyApp {
             let map = finance::request_symbols(line_vec);
 
             if map.len() > 0 {
-                let out_str = map
-                    .iter()
-                    .map(|n| n.1)
+                let lines_local = self.isins.lines();
+                let out_str = lines_local
+                    .into_iter()
+                    .filter(|n| n.len() == 12)
+                    .map(|n| map.get(n).unwrap())
                     .fold(String::new(), |acc, x| acc + x + "\n");
+
+
+                // let out_str = map
+                //     .iter()
+                //     .map(|n| n.1)
+                //     .fold(String::new(), |acc, x| acc + x + "\n");
 
                 let filename = cnf().vars.prefix_stocklist
                     + &utils::formatted_timestamp()
