@@ -9,7 +9,7 @@ I can not provide an executable file, because the heuristic of Microsoft Defende
 1. Please compile it by yourself by installing [Rust](https://www.rust-lang.org/tools/install) with RustUp.
 2. Clone Repo
 3. Run ``cargo clean -r``
-4. Run ``build -r``
+4. Run ``cargo build -r``
 5. Copy the Executable from subfolder ``target/release/fintools.exe`` to your desired location.
 6. Run it.
 
