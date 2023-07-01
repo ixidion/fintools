@@ -7,7 +7,7 @@ use finlibs::{finance, settings::get_config as cnf};
 use rfd::FileDialog;
 use std::{fs, path::PathBuf};
 
-use eframe::egui;
+use eframe::egui::{self};
 
 use crate::finlibs::utils;
 
@@ -31,7 +31,7 @@ fn main() {
         .initial_window_size
         .replace(egui::Vec2::new(400.0, 600.0));
 
-    eframe::run_native(
+    let _ = eframe::run_native(
         "FinTools",
         options,
         Box::new(|_cc| Box::new(MyApp::default())),
@@ -109,14 +109,14 @@ impl eframe::App for MyApp {
         egui::Vec2::INFINITY
     }
 
-    fn clear_color(&self, _visuals: &egui::Visuals) -> egui::Rgba {
-        // NOTE: a bright gray makes the shadows of the windows look weird.
-        // We use a bit of transparency so that if the user switches on the
-        // `transparent()` option they get immediate results.
-        egui::Color32::from_rgba_unmultiplied(12, 12, 12, 180).into()
+    // fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+    //     // NOTE: a bright gray makes the shadows of the windows look weird.
+    //     // We use a bit of transparency so that if the user switches on the
+    //     // `transparent()` option they get immediate results.
+    //     return Color32::from_rgba_unmultiplied(12, 12, 12, 180);
 
-        // _visuals.window_fill() would also be a natural choice
-    }
+    //     // _visuals.window_fill() would also be a natural choice
+    // }
 
     fn persist_native_window(&self) -> bool {
         true

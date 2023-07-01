@@ -19,6 +19,7 @@ static EXCH_MAP: Map<&'static str, &'static str> = phf_map! {
     "NMS" => "NASDAQ",
     "NGM" => "NASDAQ",
     "NYQ" => "NYSE",
+    "ASE" => "AMEX"
 };
 
 fn request_symbol(isin: &str) -> (String, String) {
@@ -35,11 +36,12 @@ fn request_symbol(isin: &str) -> (String, String) {
     match yqi {
         None => return (String::from(isin), isin.to_string() + "error"),
         Some(entry) => {
-            let mut exchange = String::from(&entry.exchange);
-            exchange = convert_exchange(exchange.as_str()).to_string();
+            let exchange = entry.exchange.as_str();
+
+            let exchange_converted = convert_exchange(exchange).to_string();
             let mut symbol = String::from(&entry.symbol);
             convert_symbol(&mut symbol);
-            combo = format!("{}:{}", exchange, symbol);
+            combo = format!("{}:{}", exchange_converted, symbol);
         }
     }
 
@@ -84,16 +86,17 @@ pub fn request_symbols(symbols: Vec<&str>) -> HashMap<String, String> {
     map
 }
 
-fn convert_exchange(ex_in: &str) -> &str {
-    let ex_out = EXCH_MAP.get(&ex_in);
+fn convert_exchange(exchange: &str) -> &'static str{
+    let exchange_str = exchange;
+    let ex_out = EXCH_MAP.get(exchange_str);
     if ex_out.is_some() {
         return ex_out.unwrap();
     } else {
         eprintln!(
-            "Error: Exchange {} was not found in the map in finance.rs.",
-            ex_in
+            "Error: Exchange {:?} was not found in the map in finance.rs.", exchange
         );
-        return "error";
+        let _out_str = format!("error_exchange_unknown '{:?}'", exchange).as_str();
+        return stringify!(out_str);
     }
 }
 
